@@ -1,8 +1,9 @@
 obj-m += escape.o
 kmod_name = escape
+KDIR ?= /lib/modules/$(shell uname -r)/build
 
 all:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	make -C $(KDIR) M=$(PWD) modules
 	echo "#include <linux/module.h>" > tmp.c
 	echo "#include <syscall.h>" >> tmp.c
 	echo "#include <stdio.h>" >> tmp.c
@@ -14,10 +15,10 @@ all:
 	cat tmp.c | sed 's/example_ko/$(kmod_name)_ko/g' > load.c
 	rm tmp.c
 	gcc -o escape load.c
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	make -C $(KDIR) M=$(PWD) clean
 	gcc -o execute execute.c
 	rm load.c
 
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	make -C $(KDIR) M=$(PWD) clean
 	rm execute escape
